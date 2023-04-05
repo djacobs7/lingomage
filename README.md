@@ -27,8 +27,13 @@ We want to make it so you can feed in an opensource project in any language, and
 Note - currently this doesn't always work, because the LLM doesn't always emit a JSON object.  We need to do some work to fix this.
 
 
-## TODO:
-* Make so it can accuratley convert a single file
-* Make it so we consistenyly list dependencies.
+## TODOS
+* Make so it can accurately convert a single file
+* Make it so we consistently list dependencies.
 * Recursively find and convert dependencies.
 * Better error handling for files that are too long for the prompt
+* Try starting from the tests files and working out way inwards
+
+## CONTRIBUTING
+
+Heck yeah, join in.  If you are reading this, you can contribute!
