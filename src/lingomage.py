@@ -22,6 +22,7 @@ def cc(messages):
     print("Sending query to open ai...")
     result = openai.ChatCompletion.create(
         model="gpt-3.5-turbo",
+        #model="gpt-4",
         messages=messages
         )
     messages.append( {"role": "assistant", "content": parse_result(result)})
@@ -82,13 +83,18 @@ def get_dependencies( src_path = typer.Argument("data/langchain/tests/unit_tests
 
          The the source code is stored at: {src_path}
          SOURCE: {src}. 
+
+         OUTPUT:
+         
          """
          }
     ])
 
     blurb = last_message(messages)
-    return json.loads(blurb)
-
+    import pdb; pdb.set_trace();
+    out= json.loads(blurb)
+    print(out)
+    return out
 
 # root_data_dir =Path("xcompile/data/")
 # src_path = Path(root_data_dir).joinpath("langchain/tests/unit_tests/prompts/test_prompt.py")

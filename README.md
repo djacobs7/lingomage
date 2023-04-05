@@ -17,7 +17,7 @@ Converting code from one language to another, using LLMs
 
 ### Find the external dependencies of a source file
 
-`python3 src/lingomage.py get_dependencies data/langchain/tests/unit_tests/prompts/test_prompt.py` 
+`python3 src/lingomage.py get-dependencies data/langchain/tests/unit_tests/prompts/test_prompt.py` 
 
 
 
