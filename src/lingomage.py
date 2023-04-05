@@ -20,16 +20,18 @@ def last_message(messages):
 
 def cc(messages):
     result = openai.ChatCompletion.create(
-        model="gpt-4",
+        model="gpt-3.5-turbo",
         messages=messages
         )
     messages.append( {"role": "assistant", "content": parse_result(result)})
     return messages
 
 @app.command()
-def convert( src_path = typer.Argument("xcompile/data/langchain/tests/unit_tests/prompts/test_prompt.py", help="Path to the source code file you want to convert"), 
+def convert( src_path = typer.Argument("data/langchain/tests/unit_tests/prompts/test_prompt.py", help="Path to the source code file you want to convert"), 
             output_language = typer.Argument("nodejs",help="The language you want to convert the code into"), 
-            output_suffix = typer.Argument(".js", help="Suffix for output files")):
+            output_suffix = typer.Argument(".js", help="Suffix for output files"),
+            project_root = typer.Argument("data/", help = "parent directory of the project containnig the source file. ( e.g if the source file is data/langchain/a/b/c.py, then project_root should be 'data/')")
+            ):
     """
     Convert a source code file into the languag eof your choice. Outputs a new source code file to your file system.
     """
@@ -52,13 +54,13 @@ def convert( src_path = typer.Argument("xcompile/data/langchain/tests/unit_tests
     code = blurb2.split("```")[1]
 
     output_root = Path("out")
-    output_path = output_root.joinpath( src_path.relative_to(root_data_dir).with_suffix(output_suffix) )
+    output_path = output_root.joinpath( src_path.relative_to(project_root).with_suffix(output_suffix) )
     output_path.parent.mkdir(parents = True, exist_ok=True)
     with open(output_path,"w") as f:
         f.write(code)
 
 @app.command()
-def get_dependencies( src_path = typer.Argument("xcompile/data/langchain/tests/unit_tests/prompts/test_prompt.py", help="Path to the source code file you want to analyze")):
+def get_dependencies( src_path = typer.Argument("data/langchain/tests/unit_tests/prompts/test_prompt.py", help="Path to the source code file you want to analyze")):
     """
     Return a list of dependencies for a source code file.
     """
@@ -93,6 +95,7 @@ def get_dependencies( src_path = typer.Argument("xcompile/data/langchain/tests/u
 # print(result)
 
 # convert( src_path, "nodejs", ".js" )
+
 
 
 
