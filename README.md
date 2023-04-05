@@ -1,6 +1,11 @@
-# LingoMage
+# 🧙‍♂️ LingoMage
 
 Converting code from one language to another, using LLMs
+
+
+## What's the goal of this project?
+
+We want to make it so you can feed in an opensource project in any language, and output a working version of that opensource project in a different language.  Think of converting langchain into javascript; converting pandas into C#, or converting the tidyverse into python.
 
 ## Usage
 
@@ -26,4 +31,4 @@ Note - currently this doesn't always work, because the LLM doesn't always emit a
 * Make so it can accuratley convert a single file
 * Make it so we consistenyly list dependencies.
 * Recursively find and convert dependencies.
-* BEtter error handling for files that are too long for the prompt
+* Better error handling for files that are too long for the prompt
