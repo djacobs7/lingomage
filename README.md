@@ -19,5 +19,11 @@ Converting code from one language to another, using LLMs
 
 `python3 src/lingomage.py get-dependencies data/langchain/tests/unit_tests/prompts/test_prompt.py` 
 
+Note - currently this doesn't always work, because the LLM doesn't always emit a JSON object.  We need to do some work to fix this.
 
 
+## TODO:
+* Make so it can accuratley convert a single file
+* Make it so we consistenyly list dependencies.
+* Recursively find and convert dependencies.
+* BEtter error handling for files that are too long for the prompt
