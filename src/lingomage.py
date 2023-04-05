@@ -19,11 +19,13 @@ def last_message(messages):
 
 
 def cc(messages):
+    print("Sending query to open ai...")
     result = openai.ChatCompletion.create(
         model="gpt-3.5-turbo",
         messages=messages
         )
     messages.append( {"role": "assistant", "content": parse_result(result)})
+
     return messages
 
 @app.command()
@@ -58,6 +60,7 @@ def convert( src_path = typer.Argument("data/langchain/tests/unit_tests/prompts/
     output_path.parent.mkdir(parents = True, exist_ok=True)
     with open(output_path,"w") as f:
         f.write(code)
+    print( f"Writing output to {output_path}")
 
 @app.command()
 def get_dependencies( src_path = typer.Argument("data/langchain/tests/unit_tests/prompts/test_prompt.py", help="Path to the source code file you want to analyze")):
