@@ -2,6 +2,7 @@ from pathlib import Path
 import openai
 import json
 import typer
+from typing import Literal, List
 
 app = typer.Typer()
 
@@ -21,8 +22,8 @@ def last_message(messages):
 def cc(messages):
     print("Sending query to open ai...")
     result = openai.ChatCompletion.create(
-        model="gpt-3.5-turbo",
-        #model="gpt-4",
+        # model="gpt-3.5-turbo",
+        model="gpt-4",
         messages=messages
         )
     messages.append( {"role": "assistant", "content": parse_result(result)})
@@ -41,6 +42,9 @@ def convert( src_path = typer.Argument("data/langchain/tests/unit_tests/prompts/
     src_path = Path(src_path)
     src = get_src(src_path)
 
+    project_root = str(project_root)
+
+    print( f"Converting file {src_path}")
     messages = cc([
         {"role": "system", "content": "You are a software developer assistant."},
         {"role": "user", "content": f"Convert the methods in the code below to {output_language}.  Make sure to convert the entire file. Do not write code for any external requirements. If something is not easy to convert, do your best.  SOURCE: {src}. "}
@@ -70,6 +74,9 @@ def get_dependencies( src_path = typer.Argument("data/langchain/tests/unit_tests
     """
     src_path = Path(src_path)
     src = get_src(src_path)
+
+    print( f"Getting dependencies for {src_path}")
+
     messages = cc([
         {"role": "system", "content": "You are a software developer assistant."},
         {"role": "user", "content": f"""Identify any require or import statements for the following source code.  
@@ -77,8 +84,11 @@ def get_dependencies( src_path = typer.Argument("data/langchain/tests/unit_tests
          
          The output should be formatted like this:
          [
-            {{"code": "import pytest", "path": "<project_root>/venv/lib/python<version>/site-packages/pytest"}},
-            {{"code": "from langchain.prompts.prompt import PromptTemplate", "path": "xcompile/data/langchain/prompts/prompt.py"}},
+            {{"code": "import pytest", "path": "<project_root>/venv/lib/python<version>/site-packages/pytest", "type": "package"}},
+            {{"code": "from string import Formatter", "path": "<project_root>/lib/string.py", "type": "python_native"}},
+            {{"code": "from langchain.prompts.prompt import PromptTemplate", "path": "xcompile/data/langchain/langchain/prompts/prompt.py", "type":"file"}},
+
+
          ]
 
          The the source code is stored at: {src_path}
@@ -92,9 +102,14 @@ def get_dependencies( src_path = typer.Argument("data/langchain/tests/unit_tests
 
     blurb = last_message(messages)
     import pdb; pdb.set_trace();
-    out= json.loads(blurb)
-    print(out)
-    return out
+    res= json.loads(blurb)
+    out= []
+    for o in res:
+        o['file'] = src_path
+        dep = Dependency(**o)
+        out.append(dep )
+    import pdb; pdb.set_trace();
+    return DependencyTree( dependencies=out )
 
 # root_data_dir =Path("xcompile/data/")
 # src_path = Path(root_data_dir).joinpath("langchain/tests/unit_tests/prompts/test_prompt.py")
@@ -103,8 +118,43 @@ def get_dependencies( src_path = typer.Argument("data/langchain/tests/unit_tests
 # result = get_dependencies(src_path)
 # print(result)
 
-# convert( src_path, "nodejs", ".js" )
 
+
+from pydantic import BaseModel
+class Dependency(BaseModel):
+    code: str
+    path: str
+    type: str
+
+    file: Path
+
+class FileDepedency( BaseModel ):
+    type: Literal['file']
+
+class ProjectDependency(Dependency):
+    type: Literal['project']
+
+class DependencyTree(BaseModel):
+    dependencies: List[Dependency]
+
+
+    #TODO: deal with cycles
+    def append_tree(self, tree):
+        self.dependencies.extend( tree.dependencies )
+
+# convert( src_path, "nodejs", ".js" )
+@app.command()
+def recurse_through_dependencies(
+    src_path = typer.Argument("data/langchain/tests/unit_tests/prompts/test_prompt.py" )
+):
+    dependencies:DependencyTree =get_dependencies(src_path)
+    
+    for dependency in dependencies.dependencies:
+        if dependency.type == 'file':
+            dependencies.append_tree( get_dependencies( dependency.path) )
+
+            #convert(dependency.path)
+    import pdb; pdb.set_trace();
 
 
 
